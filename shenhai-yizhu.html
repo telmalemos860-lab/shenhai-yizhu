@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>深海遗珠 · DEEPSEA LIVING</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Sans:wght@200;300;400&family=Noto+Serif+SC:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+:root{
+  --bg:#060d1a;--blue-light:#4a9fd4;--blue-pale:#a8d8f0;
+  --pink:#f5c2cc;--white:#e8f4fc;
+  --muted:rgba(168,216,240,0.45);
+  --glass:rgba(10,31,62,0.32);
+  --glass-border:rgba(74,159,212,0.28);
+  --glass-border-hover:rgba(245,194,204,0.6);
+  --text-glow:0 0 22px rgba(168,216,240,0.35);
+  --pink-glow:0 0 16px rgba(245,194,204,0.5);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--white);font-family:'DM Sans',-apple-system,sans-serif;font-weight:300;overflow-x:hidden;cursor:none}
+#cursor{position:fixed;width:8px;height:8px;background:var(--blue-light);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:screen;transition:background .3s,width .3s,height .3s}
+#cursor-ring{position:fixed;width:36px;height:36px;border:2px solid rgba(74,159,212,.45);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .3s,height .3s,border-color .3s}
+#three-canvas{position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:0}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1.5rem 4rem;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(to bottom,rgba(6,13,26,.8),transparent);transition:backdrop-filter .3s,background .3s}
+nav.scrolled{backdrop-filter:blur(15px);background:rgba(6,13,26,.7)}
+.nav-logo{font-family:'Noto Serif SC',serif;font-size:1.05rem;font-weight:300;letter-spacing:.18em;color:var(--white);text-decoration:none;text-shadow:var(--text-glow)}
+.nav-links{display:flex;gap:2.5rem;list-style:none}
+.nav-links a{font-size:.72rem;letter-spacing:.2em;color:var(--muted);text-decoration:none;transition:color .3s}
+.nav-links a:hover{color:var(--blue-pale)}
+#progress-bar{position:fixed;top:0;left:0;height:1px;background:linear-gradient(to right,var(--blue-light),var(--pink));z-index:200;width:0%;box-shadow:0 0 8px rgba(74,159,212,.5)}
+section{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:6rem 4rem;overflow:hidden}
+#hero{padding:0}
+.hero-inner{display:flex;flex-direction:column;align-items:center;text-align:center;gap:1.8rem}
+.hero-eyebrow{font-size:.72rem;font-weight:300;letter-spacing:.38em;color:var(--blue-light);text-shadow:var(--text-glow);opacity:0;transform:translateY(20px)}
+.hero-title{font-family:'Noto Serif SC',serif;font-weight:300;font-size:clamp(4.5rem,11vw,9rem);line-height:.95;letter-spacing:.08em;color:var(--white);text-shadow:0 0 80px rgba(74,159,212,.25),0 0 30px rgba(74,159,212,.12);opacity:0}
+.hero-title em{font-style:normal;color:var(--pink);text-shadow:var(--pink-glow)}
+.hero-divider{width:1px;height:70px;background:linear-gradient(to bottom,transparent,var(--blue-light),transparent);opacity:0}
+.hero-subtitle{font-size:.85rem;letter-spacing:.25em;color:var(--muted);opacity:0}
+.hero-tagline{font-size:.72rem;letter-spacing:.2em;color:rgba(168,216,240,.4);opacity:0}
+.scroll-hint{position:absolute;bottom:3rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.5rem;opacity:0}
+.scroll-line{width:1px;height:50px;background:linear-gradient(to bottom,rgba(74,159,212,.5),transparent);animation:sp 2s ease-in-out infinite}
+@keyframes sp{0%,100%{opacity:.3;transform:scaleY(.8)}50%{opacity:1;transform:scaleY(1)}}
+.scroll-hint span{font-size:.6rem;letter-spacing:.4em;color:rgba(74,159,212,.4)}
+.section-label{font-size:.65rem;letter-spacing:.4em;color:var(--blue-light);margin-bottom:1rem;opacity:.7}
+.section-title{font-family:'Noto Serif SC',serif;font-weight:300;font-size:clamp(1.8rem,4vw,3rem);letter-spacing:.06em;text-shadow:var(--text-glow);margin-bottom:.5rem;text-align:center}
+.section-title .accent{color:var(--pink);text-shadow:var(--pink-glow)}
+.section-line{width:40px;height:1px;background:linear-gradient(to right,transparent,var(--blue-light),transparent);margin:1rem auto}
+.glass{background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:2px solid var(--glass-border);border-radius:16px;transition:border-color .4s,box-shadow .4s}
+.glass:hover{border-color:var(--glass-border-hover);box-shadow:0 0 30px rgba(245,194,204,.25)}
+.reveal{opacity:0;transform:translateY(40px)}
+.reveal.in{opacity:1;transform:translateY(0);transition:opacity .9s ease,transform .9s cubic-bezier(.25,1,.5,1)}
+/* IP */
+#ip-section{gap:4rem}
+.ip-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;width:100%;max-width:1100px}
+.ip-card{position:relative;overflow:hidden;padding:2.5rem 2rem 2rem;cursor:pointer;text-align:center;transition:transform .5s cubic-bezier(.25,1,.5,1),box-shadow .4s;--mx:50%;--my:50%}
+.ip-card::before{content:'';position:absolute;inset:-1px;border-radius:17px;padding:2px;background:radial-gradient(200px circle at var(--mx) var(--my),rgba(245,194,204,.7),rgba(74,159,212,.4) 40%,transparent 70%);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .4s;pointer-events:none}
+.ip-card:hover::before{opacity:1}
+.ip-card:hover{transform:translateY(-10px);box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.ip-card-img{width:150px;height:150px;object-fit:contain;margin:0 auto 1.4rem;display:block;filter:drop-shadow(0 0 14px rgba(74,159,212,.35));transition:transform .5s cubic-bezier(.25,1,.5,1),filter .4s}
+.ip-card:hover .ip-card-img{transform:scale(1.12) translateY(-6px);filter:drop-shadow(0 0 22px rgba(245,194,204,.5))}
+.ip-card-sea{font-size:.65rem;letter-spacing:.3em;color:var(--blue-light);margin-bottom:.5rem}
+.ip-card-name{font-family:'Noto Serif SC',serif;font-size:1.5rem;font-weight:300;letter-spacing:.05em;margin-bottom:.2rem}
+.ip-card-en{font-size:.7rem;letter-spacing:.25em;color:var(--muted);margin-bottom:1rem}
+.ip-card-species{font-size:.78rem;color:var(--pink);text-shadow:var(--pink-glow);margin-bottom:1.2rem}
+.ip-card-cta{font-size:.65rem;letter-spacing:.3em;color:rgba(168,216,240,.4);border-top:2px solid rgba(74,159,212,.18);padding-top:1rem}
+/* POPUP SCROLLYTELLING */
+#popup-section{padding:0;min-height:auto;display:block;overflow:visible}
+.popup-sticky-wrap{position:relative;height:400vh}
+.popup-sticky{position:sticky;top:0;height:100vh;overflow:hidden}
+.popup-left{position:absolute;left:0;top:0;bottom:0;width:50%;padding:4.5rem 2rem 4.5rem 4.5rem;display:flex;flex-direction:column;justify-content:center}
+.popup-frame{position:relative;width:100%;height:100%;max-height:75vh;border-radius:16px;overflow:hidden;border:2px solid rgba(74,159,212,.35);background:transparent;box-shadow:0 0 40px rgba(74,159,212,.08), inset 0 0 60px rgba(6,13,26,.6)}
+.popup-frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;background:transparent;transition:opacity .7s ease,transform .8s cubic-bezier(.25,1,.5,1)}
+.popup-frame img.hidden{opacity:0;transform:scale(.96) translateY(8px)}
+.popup-frame img.active{opacity:1;transform:scale(1) translateY(0)}
+.popup-frame::before{content:'';position:absolute;inset:0;z-index:2;pointer-events:none;border-radius:14px;background:radial-gradient(ellipse 85% 80% at 50% 50%, transparent 55%, rgba(6,13,26,.55) 80%, rgba(6,13,26,.88) 100%)}
+.popup-frame::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(74,159,212,.012) 3px,rgba(74,159,212,.012) 4px);pointer-events:none;z-index:3}
+.popup-right{position:absolute;right:0;top:0;bottom:0;width:50%;display:flex;flex-direction:column;justify-content:center;padding:4.5rem 4.5rem 4.5rem 3rem}
+.popup-step{position:absolute;right:4.5rem;top:50%;transform:translateY(-50%);width:calc(50% - 7.5rem);opacity:0;pointer-events:none;transition:opacity .55s ease,transform .55s cubic-bezier(.25,1,.5,1)}
+.popup-step.active{opacity:1;pointer-events:all;transform:translateY(-50%) translateX(0)}
+.popup-step:not(.active){transform:translateY(calc(-50% + 20px))}
+.step-num{font-family:'Cormorant Garamond',serif;font-size:5.5rem;font-weight:300;color:rgba(74,159,212,.1);line-height:1;margin-bottom:-.3rem}
+.step-eyebrow{font-size:.65rem;letter-spacing:.36em;color:var(--blue-light);margin-bottom:1.1rem}
+.step-title{font-family:'Noto Serif SC',serif;font-size:1.75rem;font-weight:300;letter-spacing:.06em;line-height:1.4;margin-bottom:1.3rem;text-shadow:var(--text-glow)}
+.step-title em{font-style:normal;color:var(--pink)}
+.step-body{font-size:.94rem;line-height:2.05;color:rgba(232,244,252,.68);margin-bottom:1.6rem}
+.step-tags{display:flex;flex-wrap:wrap;gap:.55rem}
+.stag{font-size:.6rem;letter-spacing:.18em;color:var(--blue-light);border:2px solid rgba(74,159,212,.3);padding:.28rem .7rem;border-radius:20px}
+.stag.p{color:var(--pink);border-color:rgba(245,194,204,.3)}
+.color-row{display:flex;gap:.5rem;margin-top:1rem}
+.cswatch{flex:1;height:28px;border-radius:5px;border:1px solid rgba(255,255,255,.06)}
+.cname{font-size:.55rem;letter-spacing:.1em;color:var(--muted);text-align:center;margin-top:.3rem}
+.popup-dots{position:absolute;bottom:2.5rem;left:25%;transform:translateX(-50%);display:flex;gap:.7rem;z-index:10}
+.pdot{width:5px;height:5px;border-radius:50%;background:rgba(74,159,212,.25);transition:background .4s,transform .4s}
+.pdot.active{background:var(--blue-light);transform:scale(1.5)}
+/* MODAL */
+#modal-overlay{position:fixed;inset:0;background:rgba(6,13,26,.88);backdrop-filter:blur(20px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:2rem;opacity:0;pointer-events:none;transition:opacity .4s}
+#modal-overlay.active{opacity:1;pointer-events:all}
+.modal-box{max-width:760px;width:100%;background:rgba(7,21,38,.95);border:2px solid rgba(74,159,212,.3);border-radius:20px;padding:3rem;position:relative;transform:translateY(30px) scale(.97);transition:transform .4s cubic-bezier(.25,1,.5,1);max-height:90vh;overflow-y:auto}
+#modal-overlay.active .modal-box{transform:translateY(0) scale(1)}
+.modal-close{position:absolute;top:1.5rem;right:1.5rem;background:none;border:2px solid rgba(74,159,212,.3);color:var(--muted);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:border-color .3s,color .3s}
+.modal-close:hover{border-color:var(--pink);color:var(--pink)}
+.modal-sea-tag{display:inline-block;font-size:.62rem;letter-spacing:.35em;color:var(--blue-light);border:2px solid rgba(74,159,212,.35);padding:.3rem .8rem;border-radius:20px;margin-bottom:1.2rem}
+.modal-title{font-family:'Noto Serif SC',serif;font-size:2.8rem;font-weight:300;line-height:1;margin-bottom:.3rem}
+.modal-title em{font-style:normal;color:var(--pink);text-shadow:var(--pink-glow)}
+.modal-icon-row{font-size:4rem;margin:1.5rem 0;text-align:center}
+.modal-section-head{font-size:.65rem;letter-spacing:.35em;color:var(--blue-light);margin:1.5rem 0 .6rem;padding-bottom:.5rem;border-bottom:2px solid rgba(74,159,212,.18)}
+.modal-text{font-size:.9rem;line-height:1.85;color:rgba(232,244,252,.72)}
+.modal-threat{background:rgba(245,194,204,.06);border:2px solid rgba(245,194,204,.22);border-radius:10px;padding:1rem 1.2rem;margin-top:.8rem;color:rgba(245,194,204,.85);font-size:.88rem;line-height:1.7}
+.modal-stat-row{display:flex;gap:1rem;margin:1.2rem 0}
+.modal-stat{flex:1;text-align:center;padding:1rem;background:rgba(74,159,212,.05);border:2px solid rgba(74,159,212,.18);border-radius:10px}
+.modal-stat-num{font-family:'Cormorant Garamond',serif;font-size:2rem;color:var(--blue-pale)}
+.modal-stat-label{font-size:.68rem;letter-spacing:.2em;color:var(--muted);margin-top:.2rem}
+/* CONTACT */
+#contact-section{background:none;gap:2rem}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;max-width:800px;width:100%}
+.contact-card{padding:2.5rem}
+.contact-label{font-size:.62rem;letter-spacing:.35em;color:var(--blue-light);margin-bottom:.6rem}
+.contact-value{font-family:'Noto Serif SC',serif;font-size:1.3rem;font-weight:300;color:var(--white);text-shadow:var(--text-glow)}
+.contact-value.pink{color:var(--pink);text-shadow:var(--pink-glow)}
+.contact-card.wide{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:2rem 2.5rem}
+.contact-footer{text-align:center;font-size:.65rem;letter-spacing:.3em;color:rgba(74,159,212,.25);padding:3rem 0 2rem}
+#audio-btn{position:fixed;bottom:2rem;right:2rem;z-index:100;background:rgba(10,31,62,.6);border:2px solid var(--glass-border);color:var(--muted);padding:.6rem 1.2rem;border-radius:30px;cursor:pointer;font-size:.72rem;letter-spacing:.2em;backdrop-filter:blur(10px);transition:border-color .3s,color .3s,box-shadow .3s}
+#audio-btn:hover{border-color:var(--pink);color:var(--pink);box-shadow:0 0 16px rgba(245,194,204,.5)}
+
+/* ── HAND TRACKING UI ── */
+#hand-btn{position:fixed;bottom:2rem;left:2rem;z-index:100;background:rgba(10,31,62,.6);border:2px solid var(--glass-border);color:var(--muted);padding:.6rem 1.2rem;border-radius:30px;cursor:pointer;font-size:.72rem;letter-spacing:.2em;backdrop-filter:blur(10px);transition:border-color .3s,color .3s,box-shadow .3s;display:flex;align-items:center;gap:.5rem}
+#hand-btn:hover{border-color:var(--blue-light);color:var(--blue-pale)}
+#hand-btn.active{border-color:var(--blue-light);color:var(--blue-pale);box-shadow:0 0 16px rgba(74,159,212,.4)}
+#hand-btn .dot{width:6px;height:6px;border-radius:50%;background:var(--muted);transition:background .3s}
+#hand-btn.active .dot{background:var(--blue-light);animation:hpulse 1.2s ease-in-out infinite}
+@keyframes hpulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.6)}}
+
+#hand-dot{position:fixed;width:16px;height:16px;border-radius:50%;background:rgba(74,159,212,.7);border:2px solid var(--blue-light);box-shadow:0 0 20px rgba(74,159,212,.6),0 0 40px rgba(74,159,212,.2);pointer-events:none;z-index:98;transform:translate(-50%,-50%);opacity:0;transition:left .04s linear,top .04s linear,opacity .3s,width .3s,height .3s,background .3s,box-shadow .3s}
+#hand-dot.show{opacity:1}
+#hand-dot.fist{background:rgba(245,194,204,.85);border-color:var(--pink);box-shadow:0 0 30px rgba(245,194,204,.8),0 0 60px rgba(245,194,204,.3);width:26px;height:26px}
+#hand-dot.open{background:rgba(74,159,212,.45);border-color:var(--blue-pale);box-shadow:0 0 50px rgba(74,159,212,.6),0 0 90px rgba(74,159,212,.2);width:34px;height:34px}
+#hand-dot.point{background:rgba(168,216,240,.9);border-color:#fff;box-shadow:0 0 20px rgba(168,216,240,.9);width:12px;height:12px}
+#cam-video{position:fixed;opacity:0;pointer-events:none;width:1px;height:1px;top:-9999px}
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+<div id="progress-bar"></div>
+<canvas id="three-canvas"></canvas>
+<audio id="bg-audio" loop preload="auto"><source src="ocean-ambient.mp3" type="audio/mpeg"></audio>
+<button id="audio-btn">♪ &nbsp;OCEAN SOUND</button>
+
+<button id="hand-btn"><span class="dot"></span>手势控制</button>
+<div id="hand-dot"></div>
+
+<nav id="main-nav">
+  <a href="#hero" class="nav-logo">深海遗珠 · SHENHAI</a>
+  <ul class="nav-links">
+    <li><a href="#ip-section">IP 形象</a></li>
+    <li><a href="#popup-section">快闪设计</a></li>
+    <li><a href="#contact-section">联系我</a></li>
+  </ul>
+</nav>
+
+<section id="hero">
+  <div class="hero-inner">
+    <p class="hero-eyebrow">SHENHAI YIZHU · PUBLIC WELFARE EXHIBITION 2026</p>
+    <h1 class="hero-title">深海<em>遗珠</em></h1>
+    <div class="hero-divider"></div>
+    <p class="hero-subtitle">DEEPSEA LIVING · 交互式展览设计</p>
+    <p class="hero-tagline">守护蓝色星球 · EVERYONE IS RESPONSIBLE FOR PROTECTING THE OCEAN</p>
+  </div>
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    <span>SCROLL</span>
+  </div>
+</section>
+
+<section id="ip-section">
+  <p class="section-label reveal">FOUR SEA GUARDIANS</p>
+  <h2 class="section-title reveal">四大<span class="accent">海域守护者</span></h2>
+  <div class="section-line reveal"></div>
+  <p class="reveal" style="max-width:520px;text-align:center;font-size:.88rem;line-height:1.9;color:var(--muted);margin-bottom:3rem;">四个原生于中国近海的濒危物种，以IP形象唤起大众对海洋生态保护的关注。点击角色深入了解。</p>
+  <div class="ip-grid">
+    <div class="ip-card glass reveal" onclick="openModal('tuntun')">
+      <img src="tuntun.png" alt="豚豚 TUNTUN" class="ip-card-img">
+      <p class="ip-card-sea">东海 · EAST SEA</p>
+      <h3 class="ip-card-name">豚豚</h3><p class="ip-card-en">TUNTUN</p>
+      <p class="ip-card-species">中华白海豚</p>
+      <p class="ip-card-cta">点击查看科普 →</p>
+    </div>
+    <div class="ip-card glass reveal" onclick="openModal('jiajia')">
+      <img src="jiajia.png" alt="甲甲 JIAJIA" class="ip-card-img">
+      <p class="ip-card-sea">南海 · SOUTH SEA</p>
+      <h3 class="ip-card-name">甲甲</h3><p class="ip-card-en">JIAJIA</p>
+      <p class="ip-card-species">中华鲎</p>
+      <p class="ip-card-cta">点击查看科普 →</p>
+    </div>
+    <div class="ip-card glass reveal" onclick="openModal('mihu')">
+      <img src="mihu.png" alt="迷珊 MIHU" class="ip-card-img">
+      <p class="ip-card-sea">渤海 · BOHAI SEA</p>
+      <h3 class="ip-card-name">迷珊</h3><p class="ip-card-en">MIHU</p>
+      <p class="ip-card-species">珊瑚</p>
+      <p class="ip-card-cta">点击查看科普 →</p>
+    </div>
+    <div class="ip-card glass reveal" onclick="openModal('banban')">
+      <img src="banban.png" alt="斑斑 BANBAN" class="ip-card-img">
+      <p class="ip-card-sea">黄海 · YELLOW SEA</p>
+      <h3 class="ip-card-name">斑斑</h3><p class="ip-card-en">BANBAN</p>
+      <p class="ip-card-species">斑鳖</p>
+      <p class="ip-card-cta">点击查看科普 →</p>
+    </div>
+  </div>
+</section>
+
+<section id="popup-section">
+  <div class="popup-sticky-wrap" id="popup-wrap">
+    <div class="popup-sticky">
+      <div class="popup-left">
+        <div class="popup-frame" id="popup-frame">
+          <img id="pimg-0" src="model-annotated.png" class="active" alt="快闪店鸟瞰标注图">
+          <img id="pimg-1" src="sheji.png" class="hidden" alt="设计说明">
+          <img id="pimg-2" src="dongtai.png" class="hidden" alt="动线分析">
+          <img id="pimg-3" src="limian.png" class="hidden" alt="立面图">
+        </div>
+      </div>
+      <div class="popup-right">
+        <div class="popup-step active" id="pstep-0">
+          <div class="step-num">01</div>
+          <p class="step-eyebrow">ISOMETRIC MODEL · 鸟瞰等距模型</p>
+          <h3 class="step-title">快闪店<em>空间设计</em></h3>
+          <p class="step-body">「深海遗珠」快闪空间采用蓝紫色为主调，营造深邃海洋基底。双螺旋环绕动线引导观众沉浸式探索四大展台，从入口一路走向打卡出口。</p>
+          <div class="step-tags">
+            <span class="stag">豚豚展台</span><span class="stag">甲甲展台</span>
+            <span class="stag">迷珊展台</span><span class="stag">斑斑展台</span>
+            <span class="stag p">入口区</span><span class="stag p">衍生周边</span>
+          </div>
+        </div>
+        <div class="popup-step" id="pstep-1">
+          <div class="step-num">02</div>
+          <p class="step-eyebrow">DESIGN CONCEPT · 设计说明</p>
+          <h3 class="step-title">色彩叙事<em>从忧愁到曙光</em></h3>
+          <p class="step-body">粉色作为点睛之色，穿插于互动成功的瞬间与打卡区，象征危机中存有的希望。色彩叙事从"蓝紫色的忧愁"走向"粉色的曙光"，视觉化呈现主主题。</p>
+          <div class="color-row">
+            <div><div class="cswatch" style="background:#1a3a6e"></div><p class="cname">深蓝</p></div>
+            <div><div class="cswatch" style="background:#4a9fd4"></div><p class="cname">海蓝</p></div>
+            <div><div class="cswatch" style="background:#8ab0d4"></div><p class="cname">浅蓝</p></div>
+            <div><div class="cswatch" style="background:#f5c2cc"></div><p class="cname">粉色</p></div>
+            <div><div class="cswatch" style="background:#fde8ed"></div><p class="cname">浅粉</p></div>
+          </div>
+        </div>
+        <div class="popup-step" id="pstep-2">
+          <div class="step-num">03</div>
+          <p class="step-eyebrow">CIRCULATION · 动线分析</p>
+          <h3 class="step-title">七步<em>沉浸体验</em>流程</h3>
+          <p class="step-body">门头入场 → 领取集章卡 → 科普海洋现状 → 四大展台集章 → 奖品兑换 → 购买衍生产品 → 出口。螺旋动线设计避免逆行与拥堵，节奏流畅自然。</p>
+          <div class="step-tags">
+            <span class="stag">门头入场</span><span class="stag">集章卡</span>
+            <span class="stag">四大展台</span><span class="stag p">奖品兑换</span><span class="stag p">衍生产品</span>
+          </div>
+        </div>
+        <div class="popup-step" id="pstep-3">
+          <div class="step-num">04</div>
+          <p class="step-eyebrow">ELEVATION · 立面三视图</p>
+          <h3 class="step-title">空间结构<em>三视图解析</em></h3>
+          <p class="step-body">正视图、右视图与后视图清晰展示弧形展台的空间高度、顶部采光结构及各展区相对位置关系，为实际搭建提供精确参考依据。</p>
+          <div class="step-tags">
+            <span class="stag">正视图</span><span class="stag">右视图</span>
+            <span class="stag">后视图</span><span class="stag p">区域划分</span>
+          </div>
+        </div>
+      </div>
+      <div class="popup-dots">
+        <div class="pdot active" id="pdot-0"></div>
+        <div class="pdot" id="pdot-1"></div>
+        <div class="pdot" id="pdot-2"></div>
+        <div class="pdot" id="pdot-3"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact-section">
+  <p class="section-label reveal">GET IN TOUCH</p>
+  <h2 class="section-title reveal">联系<span class="accent">设计师</span></h2>
+  <div class="section-line reveal"></div>
+  <div class="contact-grid">
+    <div class="contact-card glass reveal">
+      <p class="contact-label">DESIGNER · 设计师</p>
+      <p class="contact-value">曹语娜</p>
+      <p style="font-size:.75rem;color:var(--muted);margin-top:.5rem;letter-spacing:.1em">ShenHai YiZhu-yuna</p>
+    </div>
+    <div class="contact-card glass reveal">
+      <p class="contact-label">PROJECT TYPE · 项目性质</p>
+      <p class="contact-value">公益交互式展览设计</p>
+      <p style="font-size:.75rem;color:var(--muted);margin-top:.5rem">Ocean Conservation Exhibition</p>
+    </div>
+    <div class="contact-card glass reveal">
+      <p class="contact-label">EMAIL · 邮箱</p>
+      <p class="contact-value pink">3153442311@qq.com</p>
+    </div>
+    <div class="contact-card glass reveal">
+      <p class="contact-label">WECHAT · 微信</p>
+      <p class="contact-value pink">X_X296</p>
+    </div>
+    <div class="contact-card wide glass reveal">
+      <div>
+        <p class="contact-label">SLOGAN · 理念</p>
+        <p style="font-family:'Noto Serif SC',serif;font-size:1.1rem;font-weight:300;color:var(--white);letter-spacing:.05em">守护蓝色星球，从了解开始</p>
+      </div>
+      <p style="font-size:.65rem;letter-spacing:.2em;color:rgba(74,159,212,.4);text-align:right">EVERYONE IS RESPONSIBLE<br>FOR PROTECTING THE OCEAN</p>
+    </div>
+  </div>
+  <p class="contact-footer reveal">© 2026 深海遗珠 · SHENHAI YIZHU · 交互式展览设计</p>
+</section>
+
+<div id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal-box glass">
+    <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    <p class="modal-sea-tag" id="modal-sea"></p>
+    <div class="modal-icon-row" id="modal-icon"></div>
+    <h2 class="modal-title" id="modal-name"></h2>
+    <div class="modal-stat-row" id="modal-stats"></div>
+    <p class="modal-section-head">HABITAT · 生存环境</p><p class="modal-text" id="modal-habitat"></p>
+    <p class="modal-section-head">BEHAVIOR · 生活习性</p><p class="modal-text" id="modal-behavior"></p>
+    <p class="modal-section-head">THREAT · 生存威胁</p><div class="modal-threat" id="modal-threat"></div>
+    <p class="modal-section-head">CHARACTER · 性格爱好</p><p class="modal-text" id="modal-character"></p>
+  </div>
+</div>
+
+<script>
+// ── THREE.JS OCEAN BACKGROUND · 粒子形态大幅升级版 ──
+(function(){
+  const canvas = document.getElementById('three-canvas');
+  const renderer = new THREE.WebGLRenderer({canvas, antialias:false, alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.5));
+  renderer.setClearColor(0x000000,0);
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 1000);
+  camera.position.z = 80;
+  let tmx=0,tmy=0,smx=0,smy=0;
+  document.addEventListener('mousemove',e=>{
+    if(!window.handActive){tmx=(e.clientX/innerWidth-.5)*2;tmy=(e.clientY/innerHeight-.5)*2;}
+  });
+  function onResize(){renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();}
+  onResize(); window.addEventListener('resize',onResize);
+
+  // ── Background shader ──
+  const bgMat = new THREE.ShaderMaterial({
+    uniforms:{uMouse:{value:new THREE.Vector2(0,0)},uTime:{value:0}},
+    vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+    fragmentShader:`
+      uniform vec2 uMouse;uniform float uTime;varying vec2 vUv;
+      void main(){
+        vec2 uv=vUv-.5;float d=length(uv);
+        vec3 col=vec3(.022,.048,.092);
+        col+=vec3(.016,.052,.125)*(1.-smoothstep(0.,.68,d));
+        vec2 mv=uMouse*.45;float md=length(uv-mv);
+        col+=vec3(.038,.115,.21)*(1.-smoothstep(0.,.30,md))*.7;
+        col+=vec3(.068,.022,.042)*(1.-smoothstep(0.,.20,length(uv-mv*1.5)))*.3;
+        float w=sin(uv.y*10.+uTime*.3)*.0025+.0025;
+        col+=vec3(0.,.022,.06)*w*(1.-d*1.8);
+        gl_FragColor=vec4(col,1.);
+      }`,
+    depthWrite:false
+  });
+  scene.add(new THREE.Mesh(new THREE.PlaneGeometry(300,200),bgMat)).position.z=-40;
+
+  // ══════════════════════════════════════
+  // 高级三维生物粒子骨架生成算法
+  // 完美逼近参考图中的饱满星尘体积感
+  // ══════════════════════════════════════
+  const N = 9000;
+
+  // 1. 海豚 TUNTUN（流线型躯体+背鳍+尾鳍）
+  function sampleDolphin(n) {
+    const pts = [];
+    for(let i=0; i<n; i++) {
+      const u = Math.random(); 
+      const x = (u - 0.5) * 60; // 身体长度
+      const bodyRadius = Math.sin(u * Math.PI) * 12; // 身体厚度
+      const theta = Math.random() * Math.PI * 2;
+      
+      let y = Math.sin(u * Math.PI * 1.5) * 6 + Math.sin(theta) * bodyRadius;
+      let z = Math.cos(theta) * bodyRadius;
+
+      // 强化背鳍
+      if(u > 0.4 && u < 0.55 && theta > 0 && theta < Math.PI * 0.8) {
+         if(Math.random() < 0.4) y += Math.random() * 12;
+      }
+      // 强化尾鳍
+      if(u < 0.12) {
+         z += (Math.random() - 0.5) * 25;
+         y += (Math.random() - 0.5) * 5;
+      }
+      // 嘴吻
+      if(u > 0.9) {
+         y -= Math.random() * 3;
+         z *= 0.3;
+      }
+      pts.push(x, y, z);
+    }
+    return pts;
+  }
+
+  // 2. 中华鲎 JIAJIA（半圆头盔状甲壳+尖锐长尾）
+  function sampleHorseshoeCrab(n) {
+    const pts = [];
+    for(let i=0; i<n; i++){
+      const r = Math.random();
+      if(r < 0.75) {
+        // 头部甲壳 - 立体穹顶
+        const theta = Math.random() * Math.PI * 2;
+        const rad = 22 * Math.sqrt(Math.random()); 
+        const domeHeight = Math.cos((rad/22) * Math.PI / 2) * 8;
+        pts.push(
+          Math.cos(theta) * rad * 0.9, 
+          Math.sin(theta) * rad + 5, 
+          domeHeight + (Math.random()-0.5)*2
+        );
+      } else {
+        // 剑尾
+        const tailPos = (r - 0.75) / 0.25; 
+        pts.push(
+          (Math.random()-0.5) * 2, 
+          -15 - tailPos * 28 + (Math.random()-0.5)*2, 
+          (Math.random()-0.5) * 2
+        );
+      }
+    }
+    return pts;
+  }
+
+  // 3. 珊瑚 MIHU（多个球形噪点簇聚合的生态形态）
+  function sampleCoral(n) {
+    const pts = [];
+    // 设定 6 个珊瑚生长中心点
+    const centers = [
+      [0, 0, 0], [-18, -8, 5], [15, -10, -6], 
+      [-10, 12, -2], [20, 8, 4], [0, 18, 8]
+    ];
+    for(let i=0; i<n; i++){
+      const c = centers[Math.floor(Math.random()*centers.length)];
+      // 越靠近中心粒子越密集
+      const r = 16 * Math.pow(Math.random(), 1.5); 
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+      pts.push(
+        c[0] + r * Math.sin(phi) * Math.cos(theta),
+        c[1] + r * Math.sin(phi) * Math.sin(theta) - 5, // 整体稍微下移
+        c[2] + r * Math.cos(phi)
+      );
+    }
+    return pts;
+  }
+
+  // 4. 斑鳖 BANBAN（巨大的扁平背甲+四肢+探出的头部）
+  function sampleTurtle(n) {
+    const pts = [];
+    for(let i=0; i<n; i++){
+      const r = Math.random();
+      if(r < 0.65) {
+        // 扁平背甲
+        const theta = Math.random() * Math.PI * 2;
+        const rad = 24 * Math.sqrt(Math.random());
+        const shellHeight = Math.cos((rad/24) * Math.PI / 2) * 6;
+        pts.push(
+          Math.cos(theta) * rad, 
+          Math.sin(theta) * rad * 1.1, 
+          shellHeight + (Math.random()-0.5)*3
+        );
+      } else if(r < 0.75) {
+        // 头部
+        const theta = Math.random() * Math.PI * 2;
+        pts.push(
+          (Math.random()-0.5)*5, 
+          26 + Math.random()*8, 
+          (Math.random()-0.5)*5
+        );
+      } else {
+        // 四肢
+        const limb = Math.floor(Math.random()*4);
+        const angles = [-0.6, -2.5, 0.6, 2.5]; // 左右前后
+        const t = angles[limb] + (Math.random()-0.5)*0.5;
+        const len = 18 + Math.random()*10;
+        pts.push(
+          Math.cos(t) * len, 
+          Math.sin(t) * len, 
+          (Math.random()-0.5)*4
+        );
+      }
+    }
+    return pts;
+  }
+
+  // 0. 深海海浪（起伏的三维网格曲面）
+  function sampleOcean(n) {
+    const pts = [];
+    for(let i=0; i<n; i++){
+      const x = (Math.random() - 0.5) * 160;
+      const z = (Math.random() - 0.5) * 80;
+      // 用三角函数生成基础起伏
+      const y = Math.sin(x * 0.05) * 8 + Math.cos(z * 0.05) * 8 + (Math.random()-0.5)*15 - 10;
+      pts.push(x, y, z);
+    }
+    return pts;
+  }
+
+  const SHAPES = [
+    sampleOcean(N),         
+    sampleDolphin(N),       
+    sampleHorseshoeCrab(N), 
+    sampleCoral(N),         
+    sampleTurtle(N),        
+  ];
+
+  // ── 主粒子系统 ──
+  const geo = new THREE.BufferGeometry();
+  const posArr    = new Float32Array(SHAPES[0]);
+  const targetArr = new Float32Array(SHAPES[0]);
+  const fromArr   = new Float32Array(SHAPES[0]);
+  const phaseArr  = new Float32Array(N);
+  const pinkArr   = new Float32Array(N);
+  const sizeArr   = new Float32Array(N);
+
+  for(let i=0; i<N; i++){
+    phaseArr[i] = Math.random()*Math.PI*2;
+    // 锁定色彩配比：80%深海蓝，20%樱花粉点缀
+    pinkArr[i]  = Math.random() < 0.20 ? 1.0 : 0.0;
+    // 让粒子更细致，还原星尘感
+    sizeArr[i]  = 0.2 + Math.random()*0.8; 
+  }
+
+  geo.setAttribute('position',  new THREE.BufferAttribute(posArr, 3));
+  geo.setAttribute('aTarget',   new THREE.BufferAttribute(targetArr, 3));
+  geo.setAttribute('aFrom',     new THREE.BufferAttribute(fromArr, 3));
+  geo.setAttribute('aPhase',    new THREE.BufferAttribute(phaseArr, 1));
+  geo.setAttribute('aPink',     new THREE.BufferAttribute(pinkArr, 1));
+  geo.setAttribute('aSize',     new THREE.BufferAttribute(sizeArr, 1));
+
+  const mat = new THREE.ShaderMaterial({
+    uniforms:{
+      uTime:    {value:0},
+      uMorph:   {value:0},
+      uMouse:   {value:new THREE.Vector2(0,0)},
+      uBurst:   {value:0},
+      uScatter: {value:0},
+      uGhost:   {value:0},
+    },
+    vertexShader:`
+      attribute float aPhase; attribute float aPink; attribute float aSize;
+      attribute vec3  aTarget; attribute vec3  aFrom;
+      uniform float uTime; uniform float uMorph; uniform float uBurst;
+      uniform float uScatter; uniform float uGhost; uniform vec2 uMouse;
+      varying float vAlpha; varying float vPink; varying float vGhost; varying float vMorph;
+
+      void main(){
+        float ease = uMorph*uMorph*(3.-2.*uMorph);
+        vec3 morphed = mix(aFrom, aTarget, ease);
+
+        float drift = 1.0 - ease*0.85;
+        vec3 p = morphed;
+        p.y += sin(uTime*0.35 + aPhase)*1.8*drift;
+        p.x += cos(uTime*0.28 + aPhase*1.4)*1.2*drift;
+
+        float dep = clamp((p.z+40.)/80., 0., 1.);
+        p.x += uMouse.x * dep * (7.+uScatter*20.);
+        p.y -= uMouse.y * dep * (4.+uScatter*12.);
+
+        float ghostDrift = uGhost*uGhost;
+        p.x += sin(aPhase*7.3+uTime*0.2)*ghostDrift*25.;
+        p.y += cos(aPhase*5.1+uTime*0.15)*ghostDrift*18.;
+        p.z += sin(aPhase*3.7)*ghostDrift*12.;
+
+        vPink  = aPink; vGhost = uGhost; vMorph = ease;
+        vAlpha = (0.35 + 0.65*sin(uTime*0.6+aPhase)) * (1.-ghostDrift*0.9);
+
+        float sz = aSize * (1.0 + ease*0.8 + uBurst*2.0);
+        sz *= (0.8 + dep*0.4);
+
+        vec4 mv = modelViewMatrix * vec4(p, 1.0);
+        gl_Position  = projectionMatrix * mv;
+        gl_Position.y += sin(uTime * 0.5) * 2.0; // 整体随海浪浮动
+        gl_PointSize = sz * (250. / -mv.z);
+      }
+    `,
+    fragmentShader:`
+      uniform float uGhost;
+      varying float vAlpha; varying float vPink; varying float vGhost; varying float vMorph;
+      void main(){
+        vec2 uv = gl_PointCoord - 0.5;
+        float d = length(uv)*2.;
+        if(d > 1.) discard;
+        float core  = 1.-smoothstep(0., 0.3, d);
+        float halo  = (1.-smoothstep(0.2, 1., d))*0.4;
+        float alpha = (core + halo) * vAlpha;
+
+        vec3 blue  = vec3(0.18, 0.62, 0.95);
+        vec3 brite = vec3(0.55, 0.88, 1.00); 
+        vec3 pink  = vec3(0.96, 0.75, 0.82);
+        vec3 ghost = vec3(0.88, 0.50, 0.62);
+
+        vec3 col = mix(blue, brite, vMorph*0.5);
+        col = mix(col, pink, vPink*(0.7+vMorph*0.3));
+        col = mix(col, ghost, vGhost*0.5);
+        col = mix(col, vec3(0.95,0.98,1.0), core*vMorph*0.5);
+
+        gl_FragColor = vec4(col, alpha);
+      }
+    `,
+    transparent:true, depthWrite:false, blending:THREE.AdditiveBlending
+  });
+
+  const points = new THREE.Points(geo, mat);
+  scene.add(points);
+
+  // 光晕层
+  const GLOW_N = 500;
+  const glowGeo = new THREE.BufferGeometry();
+  const glowPos   = new Float32Array(GLOW_N*3);
+  const glowPhase = new Float32Array(GLOW_N);
+  const glowPink  = new Float32Array(GLOW_N);
+  const glowFrom  = new Float32Array(GLOW_N*3);
+  const glowTarget= new Float32Array(GLOW_N*3);
+
+  for(let i=0;i<GLOW_N;i++){
+    const idx = Math.floor((i/GLOW_N)*N);
+    glowPos[i*3]   = SHAPES[0][idx*3];
+    glowPos[i*3+1] = SHAPES[0][idx*3+1];
+    glowPos[i*3+2] = SHAPES[0][idx*3+2];
+    glowFrom[i*3]  = glowPos[i*3];
+    glowFrom[i*3+1]= glowPos[i*3+1];
+    glowFrom[i*3+2]= glowPos[i*3+2];
+    glowTarget[i*3]  = glowPos[i*3];
+    glowTarget[i*3+1]= glowPos[i*3+1];
+    glowTarget[i*3+2]= glowPos[i*3+2];
+    glowPhase[i] = Math.random()*Math.PI*2;
+    glowPink[i]  = Math.random()<0.3 ? 1.0 : 0.0;
+  }
+  glowGeo.setAttribute('position', new THREE.BufferAttribute(glowPos,3));
+  glowGeo.setAttribute('aFrom',    new THREE.BufferAttribute(glowFrom,3));
+  glowGeo.setAttribute('aTarget',  new THREE.BufferAttribute(glowTarget,3));
+  glowGeo.setAttribute('aPhase',   new THREE.BufferAttribute(glowPhase,1));
+  glowGeo.setAttribute('aPink',    new THREE.BufferAttribute(glowPink,1));
+
+  const glowMat = new THREE.ShaderMaterial({
+    uniforms:{
+      uTime:{value:0}, uMorph:{value:0}, uGhost:{value:0},
+      uMouse:{value:new THREE.Vector2(0,0)}
+    },
+    vertexShader:`
+      attribute float aPhase; attribute float aPink;
+      attribute vec3 aFrom;   attribute vec3 aTarget;
+      uniform float uTime; uniform float uMorph; uniform float uGhost;
+      uniform vec2 uMouse;
+      varying float vAlpha; varying float vPink; varying float vG;
+      void main(){
+        float ease = uMorph*uMorph*(3.-2.*uMorph);
+        vec3 p = mix(aFrom, aTarget, ease);
+        p.y += sin(uTime*0.22+aPhase)*4.*sin(aPhase*2.1+1.3);
+        p.x += cos(uTime*0.17+aPhase*1.7)*3.*cos(aPhase*1.3);
+        p.z += sin(uTime*0.13+aPhase*0.9)*6.;
+        float dep = clamp((p.z+40.)/80.,0.,1.);
+        p.x += uMouse.x*dep*5.; p.y -= uMouse.y*dep*3.;
+        float gd = uGhost*uGhost;
+        p.x += sin(aPhase*6.1+uTime*0.08)*gd*35.;
+        p.y += cos(aPhase*4.3+uTime*0.08)*gd*25.;
+        vPink = aPink; vG = uGhost;
+        float brightness = 0.5+0.5*abs(sin(aPhase*3.7));
+        vAlpha = brightness*(0.03+0.06*abs(sin(uTime*0.28+aPhase)))*(1.-gd*0.95);
+        float sz = max(2.0, abs(sin(aPhase*5.3))*15.+abs(cos(aPhase*2.1))*10.+3.)*(1.+ease*1.5);
+        vec4 mv = modelViewMatrix*vec4(p,1.);
+        gl_Position = projectionMatrix*mv;
+        gl_Position.y += sin(uTime * 0.5) * 2.0; 
+        gl_PointSize = sz * (400./-mv.z);
+      }
+    `,
+    fragmentShader:`
+      varying float vAlpha; varying float vPink; varying float vG;
+      void main(){
+        float d = length(gl_PointCoord-0.5)*2.;
+        if(d>1.) discard;
+        float a = pow(max(0.,1.-d), 2.2)*vAlpha;
+        vec3 col = mix(vec3(0.18,0.45,0.90), vec3(0.92,0.58,0.72), vPink);
+        gl_FragColor = vec4(col, a);
+      }
+    `,
+    transparent:true, depthWrite:false, blending:THREE.AdditiveBlending
+  });
+  scene.add(new THREE.Points(glowGeo, glowMat));
+
+  // 状态机
+  let currentShape = 0;
+  let morphProgress = 1.0; 
+  let ghostProgress = 0.0;
+  let morphPhase    = 'idle'; 
+  let holdTimer     = 0;
+  let burstStr = 0, scatterStr = 0;
+  let lastFist = false;
+
+  const SHAPE_NAMES = ['— 海洋 —','海豚 TUNTUN','中华鲎 JIAJIA','珊瑚 MIHU','斑鳖 BANBAN'];
+
+  function showCreatureName(idx) {
+    let el = document.getElementById('creature-label');
+    if(!el){
+      el = document.createElement('div');
+      el.id = 'creature-label';
+      el.style.cssText='position:fixed;bottom:5rem;left:50%;transform:translateX(-50%);font-family:"Noto Serif SC",serif;font-size:1rem;letter-spacing:.25em;color:rgba(168,216,240,.8);text-shadow:0 0 20px rgba(74,159,212,.5);pointer-events:none;z-index:50;opacity:0;transition:opacity .5s';
+      document.body.appendChild(el);
+    }
+    el.textContent = SHAPE_NAMES[idx];
+    el.style.opacity='1';
+    clearTimeout(el._t);
+    el._t = setTimeout(()=>el.style.opacity='0', 3000);
+  }
+
+  function triggerMorph(toIdx) {
+    const fromPos = geo.attributes.position.array;
+    fromArr.set(fromPos);
+    geo.attributes.aFrom.needsUpdate = true;
+    targetArr.set(SHAPES[toIdx]);
+    geo.attributes.aTarget.needsUpdate = true;
+
+    for(let i=0;i<GLOW_N;i++){
+      const idx = Math.floor((i/GLOW_N)*N);
+      glowFrom[i*3]  = glowGeo.attributes.position.array[i*3];
+      glowFrom[i*3+1]= glowGeo.attributes.position.array[i*3+1];
+      glowFrom[i*3+2]= glowGeo.attributes.position.array[i*3+2];
+      glowTarget[i*3]  = SHAPES[toIdx][idx*3]  + (Math.random()-0.5)*3;
+      glowTarget[i*3+1]= SHAPES[toIdx][idx*3+1]+ (Math.random()-0.5)*3;
+      glowTarget[i*3+2]= SHAPES[toIdx][idx*3+2];
+    }
+    glowGeo.attributes.aFrom.needsUpdate   = true;
+    glowGeo.attributes.aTarget.needsUpdate = true;
+
+    morphProgress = 0;
+    ghostProgress = 0;
+    morphPhase    = 'morphing';
+    currentShape  = toIdx;
+    showCreatureName(toIdx);
+  }
+
+  window.triggerCreatureMorph = triggerMorph;
+
+  const clk = new THREE.Clock();
+  (function animate(){
+    requestAnimationFrame(animate);
+    const t   = clk.getElapsedTime();
+
+    if(window.handActive && window.handInput){
+      tmx += (window.handInput.x - tmx) * .18;
+      tmy += (window.handInput.y - tmy) * .18;
+      burstStr   += (window.handInput.burst   - burstStr)   * .12;
+      scatterStr += (window.handInput.scatter - scatterStr) * .10;
+
+      const isFist = window.handInput.burst > 0.5;
+      if(isFist && !lastFist && morphPhase === 'idle') {
+        const next = (currentShape + 1) % SHAPES.length;
+        triggerMorph(next);
+      }
+      lastFist = isFist;
+    } else {
+      burstStr   *= .92;
+      scatterStr *= .90;
+    }
+
+    if(morphPhase === 'morphing'){
+      morphProgress = Math.min(1, morphProgress + 0.012); // 减慢变形速度，更优雅
+      for(let i=0;i<N*3;i++){
+        const e = morphProgress*morphProgress*(3.-2.*morphProgress);
+        geo.attributes.position.array[i] = fromArr[i]*(1-e) + targetArr[i]*e;
+      }
+      geo.attributes.position.needsUpdate = true;
+      if(morphProgress >= 1){ morphPhase='holding'; holdTimer=0; }
+    }
+    else if(morphPhase === 'holding'){
+      holdTimer += 0.016;
+      if(holdTimer > 3.0){ morphPhase='ghosting'; } 
+    }
+    else if(morphPhase === 'ghosting'){
+      ghostProgress = Math.min(1, ghostProgress + 0.008);
+      if(ghostProgress >= 1){
+        morphPhase = 'idle';
+        ghostProgress = 0;
+        morphProgress = 0;
+        fromArr.set(SHAPES[0]);
+        geo.attributes.aFrom.needsUpdate = true;
+        targetArr.set(SHAPES[0]);
+        geo.attributes.aTarget.needsUpdate = true;
+        currentShape = 0;
+      }
+    }
+
+    smx+=(tmx-smx)*.05; smy+=(tmy-smy)*.05;
+    const mv=new THREE.Vector2(smx,smy);
+
+    mat.uniforms.uTime.value    = t;
+    mat.uniforms.uMorph.value   = morphProgress;
+    mat.uniforms.uGhost.value   = ghostProgress;
+    mat.uniforms.uMouse.value   = mv;
+    mat.uniforms.uBurst.value   = burstStr;
+    mat.uniforms.uScatter.value = scatterStr;
+    glowMat.uniforms.uTime.value  = t;
+    glowMat.uniforms.uMorph.value = morphProgress;
+    glowMat.uniforms.uGhost.value = ghostProgress;
+    glowMat.uniforms.uMouse.value = mv;
+    bgMat.uniforms.uTime.value  = t;
+    bgMat.uniforms.uMouse.value = mv;
+
+    camera.position.x += (smx*3 - camera.position.x) * .028;
+    camera.position.y += (-smy*2 - camera.position.y) * .028;
+    camera.lookAt(scene.position);
+    renderer.render(scene, camera);
+  })();
+})();
+
+// ── CURSOR ──
+const cur=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+let cx=0,cy=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{cx=e.clientX;cy=e.clientY;cur.style.left=cx+'px';cur.style.top=cy+'px';});
+(function ar(){rx+=(cx-rx)*.13;ry+=(cy-ry)*.13;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(ar);})();
+document.querySelectorAll('.ip-card,a,button').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cur.style.background='var(--pink)';cur.style.width='12px';cur.style.height='12px';ring.style.width='50px';ring.style.height='50px';ring.style.borderColor='rgba(245,194,204,.6)';});
+  el.addEventListener('mouseleave',()=>{cur.style.background='var(--blue-light)';cur.style.width='8px';cur.style.height='8px';ring.style.width='36px';ring.style.height='36px';ring.style.borderColor='rgba(74,159,212,.5)';});
+});
+
+// ── IP CARD AURORA ──
+document.querySelectorAll('.ip-card').forEach(c=>c.addEventListener('mousemove',e=>{const r=c.getBoundingClientRect();c.style.setProperty('--mx',(e.clientX-r.left)+'px');c.style.setProperty('--my',(e.clientY-r.top)+'px');}));
+
+// ── SCROLL PROGRESS + NAV ──
+window.addEventListener('scroll',()=>{
+  document.getElementById('progress-bar').style.width=(scrollY/(document.body.scrollHeight-innerHeight)*100)+'%';
+  document.getElementById('main-nav').classList.toggle('scrolled',scrollY>60);
+});
+
+// ── REVEAL ──
+const ro=new IntersectionObserver(entries=>entries.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('in'),i*80);ro.unobserve(e.target);}}),{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+
+// ── GSAP HERO ──
+gsap.registerPlugin(ScrollTrigger);
+document.fonts.ready.then(()=>{
+  gsap.timeline()
+    .to('.hero-eyebrow',{opacity:1,y:0,duration:1,ease:'power3.out'},0.3)
+    .to('.hero-title',{opacity:1,y:0,duration:1.4,ease:'power3.out'},0.6)
+    .to('.hero-divider',{opacity:1,duration:1,ease:'power2.out'},1.2)
+    .to('.hero-subtitle',{opacity:1,y:0,duration:1,ease:'power3.out'},1.4)
+    .to('.hero-tagline',{opacity:1,y:0,duration:1,ease:'power3.out'},1.7)
+    .to('.scroll-hint',{opacity:1,duration:1},2.2);
+  gsap.to('.hero-title',{yPercent:-20,ease:'none',scrollTrigger:{trigger:'#hero',start:'top top',end:'bottom top',scrub:true}});
+});
+
+// ── POPUP SCROLLYTELLING ──
+function setStep(idx){
+  for(let i=0;i<4;i++){
+    document.getElementById('pimg-'+i).className=i===idx?'active':'hidden';
+    document.getElementById('pstep-'+i).className='popup-step'+(i===idx?' active':'');
+    document.getElementById('pdot-'+i).className='pdot'+(i===idx?' active':'');
+  }
+}
+ScrollTrigger.create({
+  trigger:'#popup-wrap',start:'top top',end:'bottom bottom',
+  onUpdate:self=>{setStep(Math.min(3,Math.floor(self.progress*4)));}
+});
+
+// ── IP DATA ──
+const ipData={
+  tuntun:{sea:'东海 · EAST SEA',icon:'🐬',name:'豚豚',en:'TUNTUN',
+    stats:[['约2500头','中国种群数量'],['国家一级','保护等级'],['20-30年','寿命']],
+    habitat:'中华白海豚主要栖居于中国东南沿海浅水区域，尤其偏好在咸淡水交汇的河口地带生活。通常在水深10米以内的近岸海域活动，以珠江口及厦门湾为重要栖息地。',
+    behavior:'群居性动物，通常以3-5头为一群活动，善于跳跃。以鱼类为主食，能发出复杂声呐信号。幼豚出生时体色深灰，成长后逐渐变为标志性的粉白色。',
+    threat:'⚠️ 过度捕捞导致食物减少；近岸工程破坏栖息地；船舶螺旋桨造成物理伤害；海洋污染物在体内积累。目前种群数量持续下降，处于极度濒危状态。',
+    character:'性格：温柔善良，会主动照顾大家 · 爱好：擅长音乐、弹琴、爱好唱歌'},
+  jiajia:{sea:'南海 · SOUTH SEA',icon:'🦀',name:'甲甲',en:'JIAJIA',
+    stats:[['4.2亿年','物种历史'],['国家二级','保护等级'],['20-40年','成熟年限']],
+    habitat:'中华鲎生活在亚热带及热带浅海区域，尤以中国南方沿海滩涂最为集中。繁殖季节会大规模上岸，在沙滩高潮线处产卵。',
+    behavior:'中华鲎是地球上现存最古老的物种之一，被称为"活化石"。其蓝色血液含有鲎素（LAL），是现代医药检测细菌内毒素不可替代的试剂。',
+    threat:'⚠️ 大规模商业采血；沿海滩涂被围垦开发；鲎肉被大量捕捞；繁殖地受严重干扰，幼体成活率极低。',
+    character:'性格：害羞内向 · 爱好：爱好看书、学习'},
+  mihu:{sea:'渤海 · BOHAI SEA',icon:'🪸',name:'迷珊',en:'MIHU',
+    stats:[['不足0.1%','占海洋面积'],['养活超25%','海洋鱼类'],['每年加剧','珊瑚白化']],
+    habitat:'珊瑚礁主要分布于水温22-29℃的热带及亚热带浅海区域。中国南海珊瑚礁是全球最重要的珊瑚礁生态区之一，生物多样性极为丰富。',
+    behavior:'珊瑚是由无数珊瑚虫聚集形成的生物体，与体内共生的虫黄藻依靠光合作用共同生长，为数千种海洋生物提供栖息地。',
+    threat:'⚠️ 全球变暖导致大规模白化；海洋酸化削弱骨架形成能力；污水排放造成富营养化；过度旅游直接破坏珊瑚礁结构。',
+    character:'性格：爱漂亮、活泼 · 爱好：喜欢画画、跳舞'},
+  banban:{sea:'黄海 · YELLOW SEA',icon:'🐢',name:'斑斑',en:'BANBAN',
+    stats:[['仅约3头','已知野外数量'],['国家一级','保护等级'],['背甲>60cm','成体体型']],
+    habitat:'斑鳖曾广泛栖居于中国长江流域及红河流域，栖息于大型河流、湖泊及水库深水区，是世界上最大的淡水龟类之一。',
+    behavior:'斑鳖为顶级捕食者，以鱼类及甲壳类为食。性情温和、行动迟缓。寿命极长可达百年以上，但性成熟期也长达20年。',
+    threat:'⚠️ 已是世界上最濒危的爬行动物之一。历史上的过度捕猎、水坝建设阻断栖息地、水质污染、基因多样性丧失导致繁殖极度困难。',
+    character:'性格：动作慢慢的、爱偷懒 · 爱好：喜欢晒太阳、擅长泡茶'}
+};
+function openModal(id){
+  const d=ipData[id];
+  document.getElementById('modal-sea').textContent=d.sea;
+  document.getElementById('modal-icon').textContent=d.icon;
+  document.getElementById('modal-name').innerHTML=d.name+' <em>'+d.en+'</em>';
+  document.getElementById('modal-stats').innerHTML=d.stats.map(s=>'<div class="modal-stat"><div class="modal-stat-num">'+s[0]+'</div><div class="modal-stat-label">'+s[1]+'</div></div>').join('');
+  document.getElementById('modal-habitat').textContent=d.habitat;
+  document.getElementById('modal-behavior').textContent=d.behavior;
+  document.getElementById('modal-threat').textContent=d.threat;
+  document.getElementById('modal-character').textContent=d.character;
+  document.getElementById('modal-overlay').classList.add('active');
+  document.body.style.overflow='hidden';
+}
+function closeModal(e){if(e.target===document.getElementById('modal-overlay'))closeModalDirect();}
+function closeModalDirect(){document.getElementById('modal-overlay').classList.remove('active');document.body.style.overflow='';}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModalDirect();});
+
+// ── AUDIO ──
+const audio=document.getElementById('bg-audio'),btn=document.getElementById('audio-btn');
+let playing=false;
+btn.addEventListener('click',()=>{
+  if(playing){audio.pause();btn.textContent='♪  OCEAN SOUND';playing=false;}
+  else audio.play().then(()=>{btn.textContent='◼  MUTE';playing=true;}).catch(()=>{btn.textContent='♪  (需要音频文件)';});
+});
+
+// ── HAND TRACKING ──
+window.handActive = false;
+window.handInput  = {x:0, y:0, burst:0, scatter:0};
+const handBtn = document.getElementById('hand-btn');
+const handDot = document.getElementById('hand-dot');
+let handsInstance = null, mpCamera = null, lastGesture = 'none';
+const camVideo = document.createElement('video');
+camVideo.setAttribute('playsinline','');
+camVideo.style.cssText = 'position:fixed;opacity:0;pointer-events:none;width:1px;height:1px;top:-9999px';
+document.body.appendChild(camVideo);
+
+function classifyGesture(landmarks) {
+  const wrist = landmarks[0];
+  const mid   = landmarks[9];
+  function extended(tip, pip) { return Math.hypot(landmarks[tip].x-wrist.x, landmarks[tip].y-wrist.y) > Math.hypot(landmarks[pip].x-wrist.x, landmarks[pip].y-wrist.y) * 1.1; }
+  const fingers = [ extended(4,3), extended(8,6), extended(12,10), extended(16,14), extended(20,18) ];
+  const extCount = fingers.filter(Boolean).length;
+  if(extCount <= 1)  return 'fist';
+  if(extCount >= 4)  return 'open';
+  if(extCount === 2 && fingers[1] && fingers[2]) return 'peace';
+  if(extCount === 1 && fingers[1]) return 'point';
+  return 'none';
+}
+
+const GESTURE_MAP = {
+  open:  {scatter:1.0, burst:0,   dotClass:'open' },
+  fist:  {scatter:0,   burst:1.0, dotClass:'fist' },
+  point: {scatter:-.3, burst:0,   dotClass:'point'},
+  peace: {scatter:.2,  burst:0,   dotClass:''     },
+  none:  {scatter:0,   burst:0,   dotClass:''     }
+};
+
+function startHandTracking() {
+  function loadScript(src) { return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = rej; document.head.appendChild(s); }); }
+  Promise.all([
+    loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js'),
+    loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js')
+  ]).then(() => {
+    handsInstance = new Hands({ locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}` });
+    handsInstance.setOptions({ maxNumHands:1, modelComplexity:1, minDetectionConfidence:0.7, minTrackingConfidence:0.6 });
+    handsInstance.onResults(results => {
+      if(results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+        const lm = results.multiHandLandmarks[0];
+        const palm = lm[9];
+        window.handInput.x = -(palm.x - 0.5) * 2.5;
+        window.handInput.y = -(palm.y - 0.5) * 2.5;
+        handDot.style.left = ((1-palm.x)*innerWidth)+'px';
+        handDot.style.top  = (palm.y*innerHeight)+'px';
+        const g  = classifyGesture(lm);
+        const gd = GESTURE_MAP[g]||GESTURE_MAP.none;
+        window.handInput.burst   = gd.burst;
+        window.handInput.scatter = gd.scatter;
+
+        if(g !== lastGesture) {
+          lastGesture = g;
+          handDot.className = 'hand-dot show'+(gd.dotClass?' '+gd.dotClass:'');
+          if(g === 'fist' && typeof window.triggerCreatureMorph === 'function') {
+            window._morphIdx = ((window._morphIdx||0) + 1) % 5;
+            window.triggerCreatureMorph(window._morphIdx);
+          }
+        }
+      } else {
+        window.handInput.burst=0; window.handInput.scatter=0;
+        handDot.className='hand-dot show'; lastGesture='none';
+      }
+    });
+
+    navigator.mediaDevices.enumerateDevices().then(devices => {
+      const vids = devices.filter(d=>d.kind==='videoinput');
+      const virtualKw = ['virtual','webcam','webcast','obs','ndi','snap','mmhmm','manycam','xsplit','iriun','droidcam','epoccam'];
+      const real = vids.find(d=>!virtualKw.some(kw=>d.label.toLowerCase().includes(kw)));
+      const chosen = real||vids[0];
+      if(!chosen){ alert('未找到摄像头'); return; }
+      mpCamera = new Camera(camVideo,{ onFrame: async()=>{ await handsInstance.send({image:camVideo}); }, width:320, height:240, deviceId:chosen.deviceId });
+      mpCamera.start().catch(err=>{
+        alert('摄像头启动失败：'+err.message);
+        handBtn.classList.remove('active');
+        handBtn.innerHTML='<span class="dot"></span>手势控制';
+        window.handActive=false;
+      });
+    });
+  }).catch(()=>alert('MediaPipe 加载失败，请检查网络连接'));
+}
+
+function stopHandTracking() {
+  if(mpCamera){mpCamera.stop();mpCamera=null;}
+  if(handsInstance){handsInstance.close();handsInstance=null;}
+  window.handInput={x:0,y:0,burst:0,scatter:0}; lastGesture='none';
+}
+
+handBtn.addEventListener('click',()=>{
+  window.handActive=!window.handActive;
+  if(window.handActive){
+    handBtn.classList.add('active');
+    handBtn.innerHTML='<span class="dot"></span>手势控制 ON';
+    handDot.classList.add('show');
+    startHandTracking();
+  } else {
+    handBtn.classList.remove('active');
+    handBtn.innerHTML='<span class="dot"></span>手势控制';
+    handDot.classList.remove('show');
+    stopHandTracking();
+  }
+});
+</script>
+</body>
+</html>
