@@ -235,6 +235,90 @@ section{position:relative;z-index:2;min-height:100vh;padding:7rem 4rem 4rem;disp
 #creature-label{position:fixed;bottom:5rem;left:50%;transform:translateX(-50%);font-family:'Noto Serif SC',serif;font-size:1.2rem;letter-spacing:.25em;color:#fff;text-shadow:0 0 20px rgba(245,194,204,.8), 0 0 10px rgba(94,168,216,1);pointer-events:none;z-index:50;opacity:0;transition:opacity .5s}
 .reveal{opacity:0;transform:translateY(40px)}
 .reveal.in{opacity:1;transform:translateY(0);transition:opacity .9s,transform .9s cubic-bezier(.25,1,.5,1)}
+
+/* ════════ 移动端响应式适配（纯新增，桌面端与内容不变） ════════ */
+
+/* 触屏设备：恢复系统光标，隐藏跟随鼠标的自定义光标 */
+@media (hover:none),(pointer:coarse){
+  body{cursor:auto}
+  #cursor,#cursor-ring{display:none}
+}
+
+@media (max-width:768px){
+  /* 不再强制每屏满高，消除大段空白；收窄左右留白 */
+  section{min-height:auto;padding:6rem 1.4rem 3.5rem}
+  .section-title-cn{font-size:1.65rem}
+  .section-title-en{font-size:.62rem;letter-spacing:.3em}
+
+  /* 导航：logo+音频在第一行，菜单换到第二行居中，链接全部保留 */
+  nav,nav.scrolled{padding:.85rem 1.1rem;flex-wrap:wrap;row-gap:.55rem}
+  .nav-logo{font-size:.84rem;letter-spacing:.08em}
+  .nav-links{order:3;width:100%;justify-content:center;gap:1.1rem}
+  .nav-links a{font-size:.66rem;letter-spacing:.08em}
+  #audio-btn{padding:.45rem .85rem;font-size:.62rem}
+
+  /* Hero：双列改单列纵向堆叠，标题不再溢出、描述不再被遮挡 */
+  #hero{grid-template-columns:1fr;gap:2.4rem;padding-top:7.5rem}
+  .scroll-vertical{display:none}
+  .hero-left{max-width:100%}
+  .hero-title{font-size:3.3rem}
+  .hero-subtitle{font-size:.92rem;letter-spacing:.3em}
+  .hero-desc{font-size:.82rem;line-height:1.9}
+  .hero-ip-stack{width:100%}
+
+  /* IP世界：四列改两列 */
+  .ipw-stage{grid-template-columns:repeat(2,1fr);gap:1.6rem 1rem}
+  .ipw-platform{width:150px;height:150px;margin-bottom:1rem}
+  .ipw-img{width:115px;height:115px}
+  .ipw-name{font-size:.85rem;letter-spacing:.18em}
+
+  /* 探索展览 */
+  .exhibit-header{flex-direction:column;align-items:flex-start;gap:1rem}
+  .exhibit-stage{padding:1.2rem}
+
+  /* 体验流程：六列改两列，隐藏贯穿连线 */
+  .process-timeline{grid-template-columns:repeat(2,1fr);gap:2.2rem 1rem}
+  .process-timeline::before{display:none}
+  .proc-icon{width:66px;height:66px}
+  .proc-icon svg{width:26px;height:26px}
+
+  /* 科普知识：左右改上下，图在上 */
+  .kn-content{grid-template-columns:1fr;gap:1.8rem;padding:2rem 1.4rem}
+  .kn-right{min-height:230px;order:-1}
+  .kn-img{max-width:200px;max-height:220px}
+  .kn-name-cn{font-size:1.45rem}
+  .kn-tab{padding:.5rem 1rem;font-size:.66rem}
+
+  /* 互动体验 */
+  .interact-stage{height:420px}
+  .interact-hint .label{font-size:1.3rem}
+  .interact-hint .sub{font-size:.7rem}
+
+  /* 公益计划：三列改一列 */
+  .welfare-grid{grid-template-columns:1fr;gap:1.2rem}
+
+  /* 关于我们：三列改一列 */
+  #contact{padding:5rem 1.4rem 2rem}
+  .contact-grid{grid-template-columns:1fr;gap:2.4rem}
+  .contact-left .ct-title{font-size:1.8rem}
+  .contact-right{width:200px;height:200px;margin:0 auto}
+  .contact-footer{flex-direction:column;gap:.7rem;text-align:center;align-items:center}
+
+  /* 弹窗 */
+  .modal-box{padding:2rem 1.4rem}
+  .modal-title{font-size:1.6rem}
+
+  /* 手势按钮缩小 */
+  #hand-btn{bottom:1.1rem;left:1.1rem;padding:.5rem 1rem;font-size:.66rem}
+}
+
+/* 小屏手机进一步收窄 */
+@media (max-width:480px){
+  .hero-title{font-size:2.75rem}
+  .ipw-platform{width:124px;height:124px}
+  .ipw-img{width:96px;height:96px}
+  .contact-list{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
